@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productivity Hub - Made by Aman Pandey</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+  <!-- Splash Section -->
+  <section class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-green-400 text-white text-center p-6">
+    <h1 class="text-4xl md:text-6xl font-bold mb-4 fade-in">Welcome to Productivity Hub</h1>
+    <p class="text-lg md:text-2xl mb-6 fade-in">Your all-in-one personal dashboard — Manage tasks, time & thoughts!</p>
+    <button onclick="document.getElementById('mainApp').scrollIntoView({ behavior: 'smooth' });" class="bg-white text-blue-600 font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-300 fade-in">Enter Dashboard</button>
+    <p class="mt-10 text-sm fade-in">Made with ❤️ by <strong>Aman Pandey</strong></p>
+  </section>
+
+  <!-- Main App -->
+  <section id="mainApp" class="py-10 px-4 max-w-5xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 To-Do List</h2>
+      <div class="flex mb-4 gap-2">
+        <input type="text" id="taskInput" placeholder="Add a new task..." class="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button id="addTaskBtn" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">Add</button>
+      </div>
+      <ul id="taskList" class="space-y-3"></ul>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Pomodoro Timer -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">⏱️ Pomodoro Timer</h2>
+        <div class="flex flex-col items-center">
+          <div id="timerDisplay" class="text-4xl font-bold text-blue-600 mb-4">25:00</div>
+          <div class="space-x-2">
+            <button onclick="startTimer()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Start</button>
+            <button onclick="pauseTimer()" class="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500">Pause</button>
+            <button onclick="resetTimer()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Notes -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">🗒️ Quick Notes</h2>
+        <textarea id="quickNotes" rows="8" class="w-full border border-gray-300 rounded-lg p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Write your thoughts here..."></textarea>
+      </div>
+
+      <!-- Mini Calendar -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">📆 Today's Date</h2>
+        <div id="calendarDate" class="text-xl font-medium text-gray-600"></div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">📊 Completion Progress</h2>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div id="progressBar" class="bg-blue-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+    const progressBar = document.getElementById('progressBar');
+    const quickNotes = document.getElementById('quickNotes');
+    const calendarDate = document.getElementById('calendarDate');
+
+    let timer;
+    let timeLeft = 25 * 60;
+    let isRunning = false;
+
+    const updateTimerDisplay = () => {
+      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const seconds = String(timeLeft % 60).padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
+    };
+
+    const startTimer = () => {
+      if (isRunning) return;
+      isRunning = true;
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timer);
+          isRunning = false;
+          alert('Pomodoro completed!');
+        }
+      }, 1000);
+    };
+
+    const pauseTimer = () => {
+      clearInterval(timer);
+      isRunning = false;
+    };
+
+    const resetTimer = () => {
+      clearInterval(timer);
+      timeLeft = 25 * 60;
+      isRunning = false;
+      updateTimerDisplay();
+    };
+
+    const updateProgressBar = () => {
+      const totalTasks = taskList.children.length;
+      const completedTasks = [...taskList.children].filter(task => task.classList.contains('line-through')).length;
+      const percent = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
+      progressBar.style.width = `${percent}%`;
+    };
+
+    const addTask = () => {
+      const text = taskInput.value.trim();
+      if (!text) return;
+      const li = document.createElement('li');
+      li.className = 'flex items-center justify-between bg-gray-100 px-4 py-2 rounded-lg';
+      li.innerHTML = `
+        <span class="task-text text-gray-700 flex-grow cursor-pointer" onclick="this.classList.toggle('line-through'); updateProgressBar();">${text}</span>
+        <button class="ml-4 text-red-500 hover:text-red-700 font-semibold" onclick="this.parentElement.remove(); updateProgressBar();">Delete</button>
+      `;
+      taskList.appendChild(li);
+      taskInput.value = '';
+      updateProgressBar();
+    };
+
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+
+    // Load today's date
+    calendarDate.textContent = new Date().toDateString();
+
+    // Save/load notes
+    quickNotes.value = localStorage.getItem('quickNotes') || '';
+    quickNotes.addEventListener('input', () => localStorage.setItem('quickNotes', quickNotes.value));
+
+    updateTimerDisplay();
+  </script>
+</body>
+</html>
+
+
